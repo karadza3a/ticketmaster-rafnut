@@ -2,11 +2,16 @@ from urllib import request
 from urllib import parse
 import json
 
-url = 'https://app.ticketmaster.com/discovery/v2/events.json?apikey=pm5ziloGTZxyxkn9iGiAXAuEaDAhgnJC'
+ticketmaster_url = 'https://app.ticketmaster.com/discovery/v2/events.json?apikey=pm5ziloGTZxyxkn9iGiAXAuEaDAhgnJC'
 
 
-def get_events(params):
-    full_url = url+"&"+parse.urlencode(params)
-    print(full_url)
-    response = json.loads(request.urlopen(full_url).read())
+def api_call(url, params=None):
+    if params is not None:
+        url += "&" + parse.urlencode(params)
+    print(url)
+    response = json.loads(request.urlopen(url).read())
     return response
+
+
+def ticketmaster_api_call(params):
+    return api_call(ticketmaster_url, params)
