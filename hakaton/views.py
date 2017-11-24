@@ -1,17 +1,19 @@
-import ticketpy
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+import datetime
+
+from hakaton import api
+
+time_format = "%Y-%m-%dT%H:%M:%SZ"
 
 
 @api_view(http_method_names=['GET'])
-def test(request):
-    tm_client = ticketpy.ApiClient('pm5ziloGTZxyxkn9iGiAXAuEaDAhgnJC')
-    pages = tm_client.events.find(
-        classification_name='Hip-Hop',
-        state_code='GA',
-        start_date_time='2017-12-01T20:00:00Z',
-        end_date_time='2017-12-21T20:00:00Z'
-    )
+def test(request, classifications="Music", start_date_time=datetime.datetime.now(), end_date_time=datetime.datetime.now()+datetime.timedelta(days=10)):
+    pages = api.get_events({
+        'classifications': classifications,
+        'countryCode': 'GB',
+        'startDateTime': start_date_time.strftime(time_format),
+        'endDateTime': end_date_time.strftime(time_format)
+    })
 
-    ret = [[str(event) for event in page] for page in pages]
-    return Response(ret)
+    return Response(pages)
