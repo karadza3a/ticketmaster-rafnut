@@ -25,11 +25,12 @@ SECRET_KEY = ')+rjuc26vmu$3-@+#*g1jpx)*x_s@hz0k4j_d^v2ug1z!mw(m1'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.30.43"]
+ALLOWED_HOSTS = ["192.168.30.18", "192.168.30.43"]
 
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,6 +42,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -108,6 +111,13 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny'
     ]
 }
+
+CORS_ORIGIN_WHITELIST = (
+    'localhost:3000',
+    'localhost',
+    '127.0.0.1'
+)
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
