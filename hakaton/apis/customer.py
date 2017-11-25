@@ -31,6 +31,6 @@ def plan(request, user_id):
 
 
 @api_view(http_method_names=['GET'])
-def plan(request, plan_id):
+def get_plan(request, plan_id):
     p = Plan.objects.get(id=plan_id)
     return Response(PlanSerializer(p).data)
