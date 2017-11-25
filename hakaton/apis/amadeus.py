@@ -2,7 +2,7 @@ import datetime
 from math import sin, cos, sqrt, atan2, radians
 
 from hakaton.apis import api
-from hakaton.models import FlightPriceCache, HotelCache
+from hakaton.models import FlightPriceCache, HotelCache, HotelPriceCache
 
 amadeus_key = "jldrRx5RICjLd3yBqK1DHtto6eGxbAZm"
 
@@ -57,6 +57,13 @@ def find_near_hotel(lat, lon, check_in, check_out):
     h.lat = lat
     h.lng = lon
     h.save()
+
+    p = min([r['total_price']['amount'] for r in hotels['results']])
+    pc = HotelPriceCache()
+    pc.lat = lat
+    pc.lng = lon
+    pc.price = p
+    pc.save()
 
     return hotels
 

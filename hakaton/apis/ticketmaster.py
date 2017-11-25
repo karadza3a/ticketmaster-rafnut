@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from hakaton.apis import api
-from hakaton.models import Customer, FlightPriceCache
+from hakaton.models import Customer, FlightPriceCache, HotelPriceCache
 
 time_format = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -47,6 +47,19 @@ def flights_starting_from(lat, lng, dlat, dlng):
     return min_price
 
 
+def hotels_starting_from(lat, lng):
+    min_price = 99999999
+
+    for pc in HotelPriceCache.objects.all():
+        d = dist(lat, lng, pc.lat, pc.lng)
+        if d < 50:
+            min_price = min(pc.price, min_price)
+    if min_price == 99999999:
+        min_price = random.randint(44, 123) + random.randint(1, 99) / 100.
+
+    return min_price
+
+
 @api_view(http_method_names=['GET'])
 def events(request):
     start_date_time = datetime.now()
@@ -74,8 +87,6 @@ def real_events(request):
     user_id = request.GET["id"]
     lat = float(request.GET["lat"])
     lng = float(request.GET["lon"])
-    start_time = request.GET["startTime"]
-    end_time = request.GET["endTime"]
     user = Customer.objects.get(id=user_id)
     likes = user.saved_likes()
     start_date_time = datetime.strptime(request.GET["startTime"], "%Y-%m-%d")
@@ -136,7 +147,7 @@ def real_events(request):
             dest_lat = float(venue['location']['latitude'])
             dest_lng = float(venue['location']['longitude'])
             event['flightsStartingFrom'] = flights_starting_from(lat, lng, dest_lat, dest_lng)
-            event['hotelsStartingFrom'] = random.randint(24, 123) + random.randint(1, 99) / 100.
+            event['hotelsStartingFrom'] = hotels_starting_from(dest_lat, dest_lng)
 
     print(all_bands)
 
