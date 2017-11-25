@@ -41,11 +41,11 @@ def find_event(request, plan_id):
 
     datestring = datetime.strptime(dt, time_format_ticketmaster).strftime("%b %dth at %H:%Mh")
     distance = events[0]['distance']
+    pitch = "We found this event you might be interested in:\n%s is performing at %s in %s on %s, just %.1f" \
+            " miles away from your hotel." % (name, venue, city, datestring, distance)
     url = events[0]['url']
+    img = events[0]['image']['url']
 
-    pitch = "\nHey,\n\nWe found this event you might be interested in:\n%s is performing at %s in %s on %s, just %.1f" \
-            " miles away from your hotel.\n\nCheck it out here: %s" % (name, venue, city, datestring, distance, url)
-
-    mail.send_mail(pitch)
+    mail.send_mail(img, pitch, url)
 
     return Response("ok")
