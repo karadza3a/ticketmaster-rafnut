@@ -1,4 +1,5 @@
-from datetime import timedelta
+from datetime import timedelta,datetime
+
 
 from django.utils.datetime_safe import datetime
 from rest_framework.decorators import api_view
@@ -37,8 +38,8 @@ def real_events(request):
     user_id = request.GET["id"]
     user = Customer.objects.get(id=user_id)
     likes = user.saved_likes()
-    start_date_time = datetime.now()
-    end_date_time = datetime.now() + timedelta(days=50)
+    start_date_time = datetime.strptime(request.GET["startTime"], "%Y-%m-%d")
+    end_date_time = datetime.strptime(request.GET["endTime"], "%Y-%m-%d")
 
     all_events = []
     for like in likes:
