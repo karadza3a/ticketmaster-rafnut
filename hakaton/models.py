@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 class Customer(models.Model):
     id = models.CharField(max_length=200, primary_key=True)
-    likes = models.CharField(max_length=2000)
+    likes = models.CharField(max_length=2000, blank=True)
 
     def set_likes(self, x):
         self.likes = json.dumps(x)
@@ -20,10 +20,24 @@ class CustomerSerializer(serializers.Serializer):
     saved_likes = serializers.CharField(required=False, allow_blank=True, max_length=2000)
 
     def create(self, validated_data):
-        return Customer.objects.create(**validated_data)
+        pass
 
     def update(self, instance, validated_data):
-        instance.id = validated_data.get('id', instance.id)
-        instance.set_likes(validated_data.get('saved_likes', instance.saved_likes))
-        instance.save()
-        return instance
+        pass
+
+
+class Plan(models.Model):
+    id = models.AutoField(primary_key=True)
+    customer = models.ForeignKey(Customer)
+    plan_data = models.CharField(max_length=15000)
+
+
+class PlanSerializer(serializers.Serializer):
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
+
+    id = serializers.IntegerField()
+    plan_data = serializers.CharField()
