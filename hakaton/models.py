@@ -12,7 +12,10 @@ class Customer(models.Model):
         self.likes = json.dumps(x)
 
     def saved_likes(self):
-        return json.loads(self.likes)
+        if len(self.likes) > 0:
+            return json.loads(self.likes)
+        else:
+            return []
 
 
 class CustomerSerializer(serializers.Serializer):
