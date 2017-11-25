@@ -2,12 +2,13 @@ import random
 from datetime import timedelta, datetime
 from math import sin, cos, sqrt, atan2, radians
 
+import Geohash
 from django.utils.datetime_safe import datetime
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from hakaton.apis import api
-from hakaton.models import Customer, FlightPriceCache, HotelPriceCache
+from hakaton.models import Customer, FlightPriceCache, HotelPriceCache, Plan
 
 time_format = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -119,7 +120,6 @@ def real_events(request):
             event.pop('seatmap', None)
             event.pop('test', None)
             event.pop('promoters', None)
-            event.pop('classifications', None)
             event.pop('info', None)
             event.pop('pleaseNote', None)
             event.pop('sales', None)
@@ -152,3 +152,69 @@ def real_events(request):
     print(all_bands)
 
     return Response(all_bands)
+
+
+@api_view(http_method_names=['GET'])
+def upsell_event(request, plan_id):
+    p = Plan.objects.get(id=plan_id)
+
+    start_date_time = p.plan_data
+    start_date_time = datetime.strptime(request.GET["startTime"], "%Y-%m-%d")
+    end_date_time = datetime.strptime(request.GET["endTime"], "%Y-%m-%d")
+    start = start_date_time.strftime(time_format)
+    end = end_date_time.strftime(time_format)
+    lat = float(request.GET["lat"])
+    lng = float(request.GET["lon"])
+
+    result = upsell_event_helper(start, end, lat, lng)
+    print(result)
+    return Response(result)
+
+
+def upsell_event_helper(start, end, lat, lng):
+    params = {'classificationName': "Music",
+              'countryCode': 'GB',
+              'startDateTime': start,
+              'endDateTime': end,
+              'geoPoint': Geohash.encode(lat, lng, precision=9),
+              'radius': 30,
+              }
+
+    result = api.ticketmaster_api_call(params)
+    for event in result['_embedded']['events']:
+        maxw = 0
+        for image in event['images']:
+            if image['width'] > maxw:
+                maxw = image['width']
+                event['image'] = image
+        event.pop('images', None)
+
+        event.pop('seatmap', None)
+        event.pop('test', None)
+        event.pop('promoters', None)
+        event.pop('info', None)
+        event.pop('pleaseNote', None)
+        event.pop('sales', None)
+        event.pop('promoters', None)
+        event.pop('promoter', None)
+        event.pop('ada', None)
+
+        event['datetime'] = event['dates']["start"]["dateTime"]
+        event.pop('dates', None)
+
+        venue = event['_embedded']['venues'][0]
+        venue.pop('boxOfficeInfo', None)
+        venue.pop('parkingDetail', None)
+        venue.pop('accessibleSeatingDetail', None)
+        venue.pop('generalInfo', None)
+        venue.pop('upcomingEvents', None)
+        venue.pop('ada', None)
+        venue.pop('markets', None)
+        venue.pop('dmas', None)
+        venue.pop('test', None)
+        venue.pop('images', None)
+        event['venue'] = venue
+        event.pop('_embedded')
+
+    result = result['_embedded']['events']
+    return result
