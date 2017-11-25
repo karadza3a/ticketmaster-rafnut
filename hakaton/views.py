@@ -15,7 +15,7 @@ def get_flights(request):
                                   request.GET['returnDate'],
                                   request.GET['passengers'])
 
-    return Response(results)
+    return Response(results[:4])
 
 
 @api_view(http_method_names=['GET'])
@@ -25,11 +25,11 @@ def get_hotels(request):
                                       request.GET['checkIn'],
                                       request.GET['checkOut'])
 
-    return Response(results)
+    return Response(results[:4])
 
 
 @api_view(http_method_names=['GET'])
 def get_hotel_link(request):
     results = google.get_booking_link(request.GET['name'])
 
-    return Response(results)
+    return Response(results[:4])

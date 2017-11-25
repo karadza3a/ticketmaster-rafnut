@@ -1,5 +1,6 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+import json
 
 from hakaton.models import Customer, CustomerSerializer, Plan, PlanSerializer
 
@@ -10,7 +11,8 @@ def customer(request, user_id):
         u, created = Customer.objects.get_or_create(id=user_id)
         return Response(CustomerSerializer(u).data)
     if request.method == 'POST':
-        likes = request.POST['saved_likes']
+        body = json.loads(request.body)
+        likes = body['saved_likes']
         u, created = Customer.objects.get_or_create(id=user_id)
         u.set_likes(likes)
         u.save()

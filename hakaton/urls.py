@@ -12,5 +12,6 @@ urlpatterns = [
     url(r'^customer/(?P<user_id>[0-9]+)$', customer.customer),
     url(r'^customer/(?P<user_id>[0-9]+)/plan', customer.plan),
     url(r'^plan/(?P<plan_id>[0-9]+)$', customer.plan),
+    url(r'^tickets/real-events$', ticketmaster.real_events),
     url(r'^tickets/events$', ticketmaster.events),
 ]
