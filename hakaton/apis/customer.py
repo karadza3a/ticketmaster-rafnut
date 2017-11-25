@@ -1,6 +1,7 @@
+import json
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-import json
 
 from hakaton.models import Customer, CustomerSerializer, Plan, PlanSerializer
 
@@ -21,7 +22,8 @@ def customer(request, user_id):
 
 @api_view(http_method_names=['POST'])
 def plan(request, user_id):
-    x = request.POST['plan_data']
+    body = json.loads(request.body)
+    x = body['plan_data']
     plan_data = json.loads(x)
     u, created = Customer.objects.get_or_create(id=user_id)
     p = Plan()
