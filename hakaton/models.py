@@ -44,3 +44,10 @@ class PlanSerializer(serializers.Serializer):
 
     id = serializers.IntegerField()
     plan_data = serializers.CharField()
+
+
+class HotelCache(models.Model):
+    id = models.AutoField(primary_key=True)
+    lat = models.FloatField()
+    lng = models.FloatField()
+    json_value = models.CharField(max_length=200000)
