@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from hakaton import views
-from hakaton.apis import customer
+from hakaton.apis import customer, discovery
 from hakaton.apis import facebook, ticketmaster
 
 urlpatterns = [
@@ -13,7 +13,7 @@ urlpatterns = [
     url(r'^customer/(?P<user_id>[0-9]+)/plan$', customer.plan),
     url(r'^customer/(?P<user_id>[0-9]+)/plans$', customer.get_plans),
     url(r'^plan/(?P<plan_id>[0-9]+)$', customer.get_plan),
-    url(r'^tickets/upsell-event/(?P<plan_id>[0-9]+)$', ticketmaster.upsell_event),
+    url(r'^tickets/upsell-event/(?P<plan_id>[0-9]+)$', discovery.find_event),
     url(r'^tickets/real-events$', ticketmaster.real_events),
     url(r'^tickets/events$', ticketmaster.events),
 ]

@@ -180,6 +180,7 @@ def upsell_event(request, plan_id):
 
 def upsell_event_helper(start, end, lat, lng, radius):
     params = {'classificationName': "Music",
+              'size': 1,
               'countryCode': 'GB',
               'startDateTime': start,
               'endDateTime': end,

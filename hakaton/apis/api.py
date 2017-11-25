@@ -14,6 +14,4 @@ def api_call(url, params=None):
 
 
 def ticketmaster_api_call(params):
-    print(ticketmaster_url)
-    print(params)
     return api_call(ticketmaster_url, params)
