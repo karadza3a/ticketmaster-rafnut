@@ -1,4 +1,4 @@
-from hakaton import api
+from hakaton.apis import api
 import datetime
 
 amadeus_key = "jldrRx5RICjLd3yBqK1DHtto6eGxbAZm"
