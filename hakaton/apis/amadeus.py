@@ -1,7 +1,8 @@
 import datetime
+import json
 from math import sin, cos, sqrt, atan2, radians
 
-from hakaton.apis import api
+from hakaton.apis import api, google
 from hakaton.models import FlightPriceCache, HotelCache, HotelPriceCache
 
 amadeus_key = "jldrRx5RICjLd3yBqK1DHtto6eGxbAZm"
@@ -42,7 +43,7 @@ def find_nearest_airport(lat, lon):
 def find_near_hotel(lat, lon, check_in, check_out):
     for hotel in HotelCache.objects.all():
         if dist(float(lat), float(lon), hotel.lat, hotel.lng) < 15:
-            return hotel.json_value
+            return hotel.json_value.replace("'", "\"")
 
     hotels = send_request(url_hotels_circle,
                           {"south_west_corner": str(float(lat) - 0.05) + "," + str(float(lon) - 0.05),
@@ -51,6 +52,9 @@ def find_near_hotel(lat, lon, check_in, check_out):
                            "check_out": check_out,
                            "number_of_results": 3
                            })
+    for hotel in hotels['results']:
+        hotel["url"] = ""
+        # hotel["url"] = google.get_booking_link(hotel["property_name"] + " " + hotel["address"]["city"])
 
     h = HotelCache()
     h.json_value = hotels
