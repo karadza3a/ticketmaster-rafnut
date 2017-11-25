@@ -5,7 +5,7 @@ amadeus_key = "jldrRx5RICjLd3yBqK1DHtto6eGxbAZm"
 
 url_airport_nearest = "https://api.sandbox.amadeus.com/v1.2/airports/nearest-relevant"
 url_flight_low_fare = "https://api.sandbox.amadeus.com/v1.2/flights/low-fare-search"
-url_hotels_airport = "https://api.sandbox.amadeus.com/v1.2/hotels/search-airport"
+url_hotels_circle = "https://api.sandbox.amadeus.com/v1.2/hotels/search-box"
 url_train_search = "https://api.sandbox.amadeus.com/v1.2/trains/schedule-search"
 
 
@@ -17,6 +17,15 @@ def find_nearest_airport(lat, lon):
     airports = send_request(url_airport_nearest, {"latitude": lat, "longitude": lon})
     sorted_airports = sorted(airports, key=lambda k: k['distance'])
     return sorted_airports[0]
+
+
+def find_near_hotel(lat, lon, check_in, check_out):
+    hotels = send_request(url_hotels_circle, {"south_west_corner": str(float(lat)-0.05)+","+str(float(lon)-0.05),
+                                              "north_east_corner": str(float(lat)+0.05)+","+str(float(lon)+0.05),
+                                              "check_in": check_in,
+                                              "check_out": check_out,
+                                              "radius": 20})
+    return hotels
 
 
 def find_flight(origin_lat, origin_lon, dest_lat, dest_lon, departure_date, return_date, num_of_seats=1):
