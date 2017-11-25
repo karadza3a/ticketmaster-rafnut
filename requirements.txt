@@ -4,8 +4,13 @@ Django==1.11.7
 django-cors-headers==2.1.0
 django-filter==1.1.0
 djangorestframework==3.7.3
+docutils==0.14
+Geohash==1.0
 idna==2.6
 Markdown==2.6.9
+py==1.5.2
+pytest==3.2.5
+python-geohash==0.8.5
 pytz==2017.3
 requests==2.18.4
 ticketpy==1.1.2
