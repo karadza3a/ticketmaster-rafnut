@@ -1,7 +1,8 @@
 import datetime
+from math import sin, cos, sqrt, atan2, radians
 
 from hakaton.apis import api
-from hakaton.models import FlightPriceCache
+from hakaton.models import FlightPriceCache, HotelCache
 
 amadeus_key = "jldrRx5RICjLd3yBqK1DHtto6eGxbAZm"
 
@@ -9,6 +10,23 @@ url_airport_nearest = "https://api.sandbox.amadeus.com/v1.2/airports/nearest-rel
 url_flight_low_fare = "https://api.sandbox.amadeus.com/v1.2/flights/low-fare-search"
 url_hotels_circle = "https://api.sandbox.amadeus.com/v1.2/hotels/search-box"
 url_train_search = "https://api.sandbox.amadeus.com/v1.2/trains/schedule-search"
+
+
+def dist(lat, lng, dest_lat, dest_lng):
+    R = 6373.0
+
+    lat1 = radians(lat)
+    lon1 = radians(lng)
+    lat2 = radians(dest_lat)
+    lon2 = radians(dest_lng)
+
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    return R * c
 
 
 def send_request(url, params):
@@ -22,12 +40,24 @@ def find_nearest_airport(lat, lon):
 
 
 def find_near_hotel(lat, lon, check_in, check_out):
+    for hotel in HotelCache.objects.all():
+        if dist(float(lat), float(lon), hotel.lat, hotel.lng) < 15:
+            return hotel.json_value
+
     hotels = send_request(url_hotels_circle,
                           {"south_west_corner": str(float(lat) - 0.05) + "," + str(float(lon) - 0.05),
                            "north_east_corner": str(float(lat) + 0.05) + "," + str(float(lon) + 0.05),
                            "check_in": check_in,
                            "check_out": check_out,
-                           "radius": 20})
+                           "number_of_results": 3
+                           })
+
+    h = HotelCache()
+    h.json_value = hotels
+    h.lat = lat
+    h.lng = lon
+    h.save()
+
     return hotels
 
 
@@ -39,7 +69,8 @@ def find_flight(origin_lat, origin_lon, dest_lat, dest_lon, departure_date, retu
               "origin": origin_airport["city"],
               "destination": destination_airport["city"],
               "departure_date": departure_date,
-              "return_date": return_date
+              "return_date": return_date,
+              "number_of_results": 5
               }
 
     results = send_request(url_flight_low_fare, params)
