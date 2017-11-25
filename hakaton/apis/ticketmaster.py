@@ -165,22 +165,33 @@ def upsell_event(request, plan_id):
     end = end_date_time.strftime(time_format)
     lat = float(request.GET["lat"])
     lng = float(request.GET["lon"])
+    radius = 30
 
-    result = upsell_event_helper(start, end, lat, lng)
+    result = upsell_event_helper(start, end, lat, lng, radius)
+    while True:
+        if len(result) == 0 and radius < 300:
+            radius += 30
+            result = upsell_event_helper(start, end, lat, lng, radius)
+        else:
+            break
     print(result)
     return Response(result)
 
 
-def upsell_event_helper(start, end, lat, lng):
+def upsell_event_helper(start, end, lat, lng, radius):
     params = {'classificationName': "Music",
               'countryCode': 'GB',
               'startDateTime': start,
               'endDateTime': end,
               'geoPoint': Geohash.encode(lat, lng, precision=9),
-              'radius': 30,
+              'radius': radius,
               }
 
     result = api.ticketmaster_api_call(params)
+
+    if '_embedded' not in result:
+        return []
+
     for event in result['_embedded']['events']:
         maxw = 0
         for image in event['images']:

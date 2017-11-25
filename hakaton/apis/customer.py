@@ -21,11 +21,12 @@ def customer(request, user_id):
 
 @api_view(http_method_names=['POST'])
 def plan(request, user_id):
-    plan_data = request.POST['plan_data']
+    x = request.POST['plan_data']
+    plan_data = json.loads(x)
     u, created = Customer.objects.get_or_create(id=user_id)
     p = Plan()
     p.customer = u
-    p.plan_data = plan_data
+    p.plan_data = json.dumps(plan_data)
     p.save()
     return Response(PlanSerializer(p).data)
 
@@ -33,4 +34,11 @@ def plan(request, user_id):
 @api_view(http_method_names=['GET'])
 def get_plan(request, plan_id):
     p = Plan.objects.get(id=plan_id)
-    return Response(PlanSerializer(p).data)
+    js = json.loads(p.plan_data)
+    return Response(js)
+
+
+@api_view(http_method_names=['GET'])
+def get_plans(request, user_id):
+    ps = Plan.objects.filter(customer__id=user_id)
+    return Response([PlanSerializer(plan).data for plan in ps])

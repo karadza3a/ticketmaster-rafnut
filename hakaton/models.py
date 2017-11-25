@@ -17,6 +17,9 @@ class Customer(models.Model):
         else:
             return []
 
+    def __str__(self):
+        return "%s, %s" % (self.id, str(self.likes))
+
 
 class CustomerSerializer(serializers.Serializer):
     id = serializers.CharField(max_length=200, read_only=True)
@@ -33,6 +36,9 @@ class Plan(models.Model):
     id = models.AutoField(primary_key=True)
     customer = models.ForeignKey(Customer)
     plan_data = models.CharField(max_length=15000)
+
+    def __str__(self):
+        return "%d, %s" % (self.id, self.plan_data)
 
 
 class PlanSerializer(serializers.Serializer):
@@ -64,9 +70,15 @@ class HotelPriceCache(models.Model):
     lng = models.FloatField()
     price = models.FloatField()
 
+    def __str__(self):
+        return "HPC price: %f" % self.price
+
 
 class HotelCache(models.Model):
     id = models.AutoField(primary_key=True)
     lat = models.FloatField()
     lng = models.FloatField()
     json_value = models.CharField(max_length=200000)
+
+    def __str__(self):
+        return "%f,%f: %s" % (self.lat, self.lng, self.json_value)
