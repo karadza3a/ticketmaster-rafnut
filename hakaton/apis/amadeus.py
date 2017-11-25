@@ -1,5 +1,7 @@
-from hakaton.apis import api
 import datetime
+
+from hakaton.apis import api
+from hakaton.models import FlightPriceCache
 
 amadeus_key = "jldrRx5RICjLd3yBqK1DHtto6eGxbAZm"
 
@@ -20,11 +22,12 @@ def find_nearest_airport(lat, lon):
 
 
 def find_near_hotel(lat, lon, check_in, check_out):
-    hotels = send_request(url_hotels_circle, {"south_west_corner": str(float(lat)-0.05)+","+str(float(lon)-0.05),
-                                              "north_east_corner": str(float(lat)+0.05)+","+str(float(lon)+0.05),
-                                              "check_in": check_in,
-                                              "check_out": check_out,
-                                              "radius": 20})
+    hotels = send_request(url_hotels_circle,
+                          {"south_west_corner": str(float(lat) - 0.05) + "," + str(float(lon) - 0.05),
+                           "north_east_corner": str(float(lat) + 0.05) + "," + str(float(lon) + 0.05),
+                           "check_in": check_in,
+                           "check_out": check_out,
+                           "radius": 20})
     return hotels
 
 
@@ -69,5 +72,14 @@ def find_flight(origin_lat, origin_lon, dest_lat, dest_lon, departure_date, retu
                                 ";px=" + str(num_of_seats) +
                                 ";sel=" + sel
                                 )
+
+    p = min([r['fare']['total_price'] for r in results['results']])
+    pc = FlightPriceCache()
+    pc.start_lat = origin_lat
+    pc.start_lng = origin_lon
+    pc.end_lat = dest_lat
+    pc.end_lng = dest_lon
+    pc.price = p
+    pc.save()
 
     return results

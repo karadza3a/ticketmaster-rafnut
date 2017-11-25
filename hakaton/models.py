@@ -44,3 +44,22 @@ class PlanSerializer(serializers.Serializer):
 
     id = serializers.IntegerField()
     plan_data = serializers.CharField()
+
+
+class FlightPriceCache(models.Model):
+    id = models.AutoField(primary_key=True)
+    start_lat = models.FloatField()
+    start_lng = models.FloatField()
+    end_lat = models.FloatField()
+    end_lng = models.FloatField()
+    price = models.FloatField()
+
+    def __str__(self):
+        return "FPC price: %f" % self.price
+
+
+class HotelPriceCache(models.Model):
+    id = models.AutoField(primary_key=True)
+    lat = models.FloatField()
+    lng = models.FloatField()
+    price = models.FloatField()
