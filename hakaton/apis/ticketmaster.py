@@ -109,47 +109,53 @@ def real_events(request):
             })
 
     for band in all_bands:
+        good_list = []
         for event in band['events']:
-            maxw = 0
-            for image in event['images']:
-                if image['width'] > maxw:
-                    maxw = image['width']
-                    event['image'] = image
-            event.pop('images', None)
+            try:
+                maxw = 0
+                for image in event['images']:
+                    if image['width'] > maxw:
+                        maxw = image['width']
+                        event['image'] = image
+                event.pop('images', None)
 
-            event.pop('seatmap', None)
-            event.pop('test', None)
-            event.pop('promoters', None)
-            event.pop('info', None)
-            event.pop('pleaseNote', None)
-            event.pop('sales', None)
-            event.pop('promoters', None)
-            event.pop('promoter', None)
-            event.pop('ada', None)
+                event.pop('seatmap', None)
+                event.pop('test', None)
+                event.pop('promoters', None)
+                event.pop('info', None)
+                event.pop('pleaseNote', None)
+                event.pop('sales', None)
+                event.pop('promoters', None)
+                event.pop('promoter', None)
+                event.pop('ada', None)
 
-            event['datetime'] = event['dates']["start"]["dateTime"]
-            event.pop('dates', None)
+                event['datetime'] = event['dates']["start"]["dateTime"]
+                event.pop('dates', None)
 
-            venue = event['_embedded']['venues'][0]
-            venue.pop('boxOfficeInfo', None)
-            venue.pop('parkingDetail', None)
-            venue.pop('accessibleSeatingDetail', None)
-            venue.pop('generalInfo', None)
-            venue.pop('upcomingEvents', None)
-            venue.pop('ada', None)
-            venue.pop('markets', None)
-            venue.pop('dmas', None)
-            venue.pop('test', None)
-            venue.pop('images', None)
-            event['venue'] = venue
-            event.pop('_embedded')
+                venue = event['_embedded']['venues'][0]
+                venue.pop('boxOfficeInfo', None)
+                venue.pop('parkingDetail', None)
+                venue.pop('accessibleSeatingDetail', None)
+                venue.pop('generalInfo', None)
+                venue.pop('upcomingEvents', None)
+                venue.pop('ada', None)
+                venue.pop('markets', None)
+                venue.pop('dmas', None)
+                venue.pop('test', None)
+                venue.pop('images', None)
+                event['venue'] = venue
+                event.pop('_embedded')
 
-            dest_lat = float(venue['location']['latitude'])
-            dest_lng = float(venue['location']['longitude'])
-            event['flightsStartingFrom'] = flights_starting_from(lat, lng, dest_lat, dest_lng)
-            event['hotelsStartingFrom'] = hotels_starting_from(dest_lat, dest_lng)
+                dest_lat = float(venue['location']['latitude'])
+                dest_lng = float(venue['location']['longitude'])
+                event['flightsStartingFrom'] = flights_starting_from(lat, lng, dest_lat, dest_lng)
+                event['hotelsStartingFrom'] = hotels_starting_from(dest_lat, dest_lng)
+                good_list.append(event)
+            except:
+                pass
+        band["events"] = good_list
 
-    print(all_bands)
+    # print(good_list)
 
     return Response(all_bands)
 

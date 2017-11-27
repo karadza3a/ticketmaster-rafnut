@@ -5,7 +5,7 @@ from math import sin, cos, sqrt, atan2, radians
 from hakaton.apis import api, google
 from hakaton.models import FlightPriceCache, HotelCache, HotelPriceCache
 
-amadeus_key = "jldrRx5RICjLd3yBqK1DHtto6eGxbAZm"
+amadeus_key = "jy1LyfDYQoy0bhVGmo01IzuNVR2QVHt5"
 
 url_airport_nearest = "https://api.sandbox.amadeus.com/v1.2/airports/nearest-relevant"
 url_flight_low_fare = "https://api.sandbox.amadeus.com/v1.2/flights/low-fare-search"
@@ -53,8 +53,8 @@ def find_near_hotel(lat, lon, check_in, check_out):
                            "number_of_results": 3
                            })
     for hotel in hotels['results']:
-        hotel["url"] = ""
-        # hotel["url"] = google.get_booking_link(hotel["property_name"] + " " + hotel["address"]["city"])
+        # hotel["url"] = ""
+        hotel["url"] = google.get_booking_link(hotel["property_name"] + " " + hotel["address"]["city"])
 
     h = HotelCache()
     h.json_value = hotels
@@ -62,14 +62,16 @@ def find_near_hotel(lat, lon, check_in, check_out):
     h.lng = lon
     h.save()
 
-    p = min([r['total_price']['amount'] for r in hotels['results']])
-    pc = HotelPriceCache()
-    pc.lat = lat
-    pc.lng = lon
-    pc.price = p
-    pc.save()
+    x = [r['total_price']['amount'] for r in hotels['results']]
+    if len(x) != 0:
+        p = min(x)
+        pc = HotelPriceCache()
+        pc.lat = lat
+        pc.lng = lon
+        pc.price = p
+        pc.save()
 
-    return hotels
+    return json.dumps(hotels)
 
 
 def find_flight(origin_lat, origin_lon, dest_lat, dest_lon, departure_date, return_date, num_of_seats=1):
@@ -81,7 +83,7 @@ def find_flight(origin_lat, origin_lon, dest_lat, dest_lon, departure_date, retu
               "destination": destination_airport["city"],
               "departure_date": departure_date,
               "return_date": return_date,
-              "number_of_results": 5
+              "number_of_results": 4
               }
 
     results = send_request(url_flight_low_fare, params)
